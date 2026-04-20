@@ -1,4 +1,12 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
   "omnisharp.dotnetPath": "/Users/igortiburciocavalcanti/.local/share/mise/dotnet-root/dotnet",
   "terminal.integrated.env.osx": {
     "PATH": "/Users/igortiburciocavalcanti/.local/share/mise/shims:${env:PATH}"

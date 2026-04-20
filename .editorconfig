@@ -1,0 +1,19 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+dotnet_style_allow_multiple_blank_lines_experimental = false
+dotnet_style_allow_statement_immediately_after_block_experimental = false
+
+# Apply formatting diagnostics so fix-all can correct style issues.
+dotnet_diagnostic.IDE0055.severity = warning
+
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
