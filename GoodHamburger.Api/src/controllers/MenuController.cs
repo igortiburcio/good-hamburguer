@@ -1,19 +1,20 @@
 
 using Microsoft.AspNetCore.Mvc;
+using GoodHamburger.Application.Src.UseCases;
 
 namespace GoodHamburger.Api.Src.Controllers;
 
 [ApiController]
 [Route("api/menu")]
-public class MenuController(ILogger<MenuController> logger) : ControllerBase
+public class MenuController(ILogger<MenuController> logger, MenuUseCase _menuUseCase) : ControllerBase
 {
-    private readonly string[] _menu = ["Hamburger", "Cheeseburger", "Veggie Burger", "Chicken Burger", "Fish Burger"];
-
     [HttpGet()]
-    public IActionResult GetMenu()
+    public async Task<IActionResult> GetMenu()
     {
         logger.LogInformation("Fetching menu items");
 
-        return Ok(_menu);
+        var menu = await _menuUseCase.GetMenuAsync();
+
+        return Ok(menu);
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using GoodHamburger.Application.Src.Repositories;
+using GoodHamburger.Infra.Src.Db.Repositories;
 
 namespace GoodHamburger.Infra.Src.Db;
 
@@ -13,6 +15,8 @@ public static class DependencyInjection
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        services.AddScoped<IProductRepository, ProductRepository>();
 
         return services;
     }
