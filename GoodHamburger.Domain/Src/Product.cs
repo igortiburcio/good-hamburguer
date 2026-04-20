@@ -7,4 +7,4 @@ public enum ProductType
     Drink
 }
 
-public record Product(string Name, decimal Price, ProductType Type);
+public record Product(string id, string Name, decimal Price, ProductType Type);
