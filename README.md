@@ -90,27 +90,9 @@ dotnet run --project GoodHamburger.View
 
 URL padrao da View: `http://localhost:5189`
 
-## Deploy simples (Coolify)
+## Deploy
 
-Este repositorio esta pronto para deploy com Docker Compose:
-
-- `postgres`: banco
-- `api`: backend .NET
-- `view`: frontend Blazor Server
-
-Recomendacao no Coolify:
-
-- Expor publicamente apenas o servico `view`.
-- Manter `api` privado na rede interna (a view chama `http://api:8080`).
-
-Variaveis importantes:
-
-- `POSTGRES_DB`
-- `POSTGRES_USER`
-- `POSTGRES_PASSWORD`
-- `POSTGRES_PORT` (opcional para host)
-- `API_PORT` (opcional para host)
-- `VIEW_PORT` (opcional para host)
+Fiz um deploy quie pode ser testado no seguinte link: https://stgen-teste.duduisonfire.com/
 
 ## Como rodar testes
 
@@ -167,8 +149,8 @@ Padrao de payload:
 
 ```json
 {
-  "code": "INVALID_ORDER",
-  "message": "Pedido invalido: ..."
+    "code": "INVALID_ORDER",
+    "message": "Pedido invalido: ..."
 }
 ```
 
@@ -180,5 +162,4 @@ Codigos usados:
 
 ## Itens fora do escopo
 
-- Testes de integracao HTTP e banco real
 - Autenticacao/autorizacao
