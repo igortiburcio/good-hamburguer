@@ -27,5 +27,8 @@ public class OrderEntity
     [Column("total_price")]
     public decimal TotalPrice { get; set; }
 
+    [Column("deleted_at")]
+    public DateTimeOffset? DeletedAt { get; set; }
+
     public ICollection<OrderProductEntity> OrderProducts { get; set; } = [];
 }

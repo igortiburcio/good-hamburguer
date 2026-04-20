@@ -2,11 +2,15 @@ using GoodHamburger.Domain.Src;
 using GoodHamburger.Application.Src.Repositories;
 using GoodHamburger.Infra.Src.Db.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Hybrid;
 
 namespace GoodHamburger.Infra.Src.Db.Repositories;
 
-public class OrderRepository(AppDbContext dbContext) : IOrderRepository
+public class OrderRepository(AppDbContext dbContext, HybridCache hybridCache) : IOrderRepository
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromMinutes(5);
+    private const string OrdersAllCacheKey = "orders:all:v1";
+
     public async Task<Order> CreateAsync(Order order)
     {
         var orderId = string.IsNullOrWhiteSpace(order.id) ? Guid.NewGuid() : Guid.Parse(order.id);
@@ -33,6 +37,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
         dbContext.OrderProducts.AddRange(productLinks);
 
         await dbContext.SaveChangesAsync();
+        await hybridCache.RemoveAsync(OrdersAllCacheKey);
 
         return await GetRequiredByIdAsync(orderId);
     }
@@ -49,14 +54,25 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
 
     public async Task<List<Order>> GetAllAsync()
     {
-        var orderEntities = await dbContext.Orders
-            .AsNoTracking()
-            .Include(o => o.OrderProducts)
-            .ThenInclude(op => op.Product)
-            .ThenInclude(p => p.Category)
-            .ToListAsync();
+        return await hybridCache.GetOrCreateAsync(
+            OrdersAllCacheKey,
+            async _ =>
+            {
+                var orderEntities = await dbContext.Orders
+                    .AsNoTracking()
+                    .Where(o => o.DeletedAt == null)
+                    .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                    .ThenInclude(p => p.Category)
+                    .ToListAsync();
 
-        return orderEntities.Select(MapToDomain).ToList();
+                return orderEntities.Select(MapToDomain).ToList();
+            },
+            options: new HybridCacheEntryOptions
+            {
+                Expiration = CacheDuration,
+                LocalCacheExpiration = CacheDuration
+            });
     }
 
     public async Task<Order?> UpdateAsync(Order order)
@@ -68,7 +84,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
 
         var orderEntity = await dbContext.Orders
             .Include(o => o.OrderProducts)
-            .FirstOrDefaultAsync(o => o.Id == orderId);
+            .FirstOrDefaultAsync(o => o.Id == orderId && o.DeletedAt == null);
 
         if (orderEntity is null)
         {
@@ -94,6 +110,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
         dbContext.OrderProducts.AddRange(productLinks);
 
         await dbContext.SaveChangesAsync();
+        await hybridCache.RemoveAsync(OrdersAllCacheKey);
 
         return await GetOrderByIdAsync(orderId);
     }
@@ -107,17 +124,17 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
 
         var orderEntity = await dbContext.Orders
             .Include(o => o.OrderProducts)
-            .FirstOrDefaultAsync(o => o.Id == orderId);
+            .FirstOrDefaultAsync(o => o.Id == orderId && o.DeletedAt == null);
 
         if (orderEntity is null)
         {
             return false;
         }
 
-        dbContext.OrderProducts.RemoveRange(orderEntity.OrderProducts);
-        dbContext.Orders.Remove(orderEntity);
+        orderEntity.DeletedAt = DateTimeOffset.UtcNow;
 
         await dbContext.SaveChangesAsync();
+        await hybridCache.RemoveAsync(OrdersAllCacheKey);
 
         return true;
     }
@@ -137,7 +154,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .Include(o => o.OrderProducts)
             .ThenInclude(op => op.Product)
             .ThenInclude(p => p.Category)
-            .FirstOrDefaultAsync(o => o.Id == id);
+            .FirstOrDefaultAsync(o => o.Id == id && o.DeletedAt == null);
 
         return orderEntity is null ? null : MapToDomain(orderEntity);
     }
