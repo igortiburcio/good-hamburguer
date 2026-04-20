@@ -56,8 +56,6 @@ Voce pode executar de duas formas.
 
 #### Opcao A: sem Docker (local)
 
-Use o passo 3 antes desta opcao.
-
 Terminal 1 (API):
 
 ```bash
