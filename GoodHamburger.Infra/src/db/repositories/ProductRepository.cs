@@ -1,9 +1,10 @@
-using GoodHamburger.Domain.Src;
 using Microsoft.EntityFrameworkCore;
+using GoodHamburger.Domain.Src;
+using GoodHamburger.Application.Src.Repositories;
 
-namespace GoodHamburger.Infra.Src.Db.Repository;
+namespace GoodHamburger.Infra.Src.Db.Repositories;
 
-public class ProductRepository(AppDbContext dbContext)
+public class ProductRepository(AppDbContext dbContext) : IProductRepository
 {
     public async Task<List<Product>> GetAllProductsAsync()
     {
