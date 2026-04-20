@@ -5,4 +5,5 @@
   <Project Path="GoodHamburger.Domain/GoodHamburger.Domain.csproj" />
   <Project Path="GoodHamburger.Domain.Tests/GoodHamburger.Domain.Tests.csproj" />
   <Project Path="GoodHamburger.Infra/GoodHamburger.Infra.csproj" />
+  <Project Path="GoodHamburger.View/GoodHamburger.View.csproj" />
 </Solution>

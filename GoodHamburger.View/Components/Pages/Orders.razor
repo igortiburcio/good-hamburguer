@@ -1,0 +1,103 @@
+@page "/orders"
+@inject GoodHamburger.View.Services.IOrdersApiClient OrdersApiClient
+
+<PageTitle>Pedidos</PageTitle>
+
+<div class="mx-auto max-w-6xl px-4 py-8">
+    <div class="mb-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-slate-900">Pedidos</h1>
+            <p class="text-slate-600">Lista de pedidos registrados.</p>
+        </div>
+        <a href="/orders/new" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">Novo pedido</a>
+    </div>
+
+    <GoodHamburger.View.Components.Shared.ApiErrorAlert Code="@_errorCode" Message="@_errorMessage" />
+
+    @if (_isLoading)
+    {
+        <div class="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Carregando pedidos...</div>
+    }
+    else if (_orders.Count == 0)
+    {
+        <div class="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Nenhum pedido cadastrado.</div>
+    }
+    else
+    {
+        <div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Cliente</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Itens</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">Total</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var order in _orders)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 text-sm text-slate-800">@order.ClientName</td>
+                            <td class="px-4 py-3 text-sm text-slate-700">@string.Join(", ", order.Products.Select(p => p.Name))</td>
+                            <td class="px-4 py-3 text-sm font-semibold text-emerald-700">@order.TotalFinal.ToString("C")</td>
+                            <td class="px-4 py-3 text-right text-sm">
+                                <a class="mr-3 text-slate-700 hover:text-slate-900" href="@($"/orders/{order.Id}")">Detalhes</a>
+                                <a class="mr-3 text-slate-700 hover:text-slate-900" href="@($"/orders/{order.Id}/edit")">Editar</a>
+                                <button class="text-red-700 hover:text-red-800" @onclick="() => DeleteOrderAsync(order.Id)">Excluir</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@code {
+    private readonly List<GoodHamburger.View.Services.OrderResponseDto> _orders = [];
+    private bool _isLoading = true;
+    private string? _errorCode;
+    private string? _errorMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync()
+    {
+        _isLoading = true;
+        _errorCode = null;
+        _errorMessage = null;
+
+        var result = await OrdersApiClient.GetAllAsync();
+
+        if (!result.IsSuccess)
+        {
+            _errorCode = result.ErrorCode;
+            _errorMessage = result.ErrorMessage;
+            _orders.Clear();
+            _isLoading = false;
+            return;
+        }
+
+        _orders.Clear();
+        _orders.AddRange(result.Data ?? []);
+        _isLoading = false;
+    }
+
+    private async Task DeleteOrderAsync(string id)
+    {
+        var result = await OrdersApiClient.DeleteAsync(id);
+
+        if (!result.IsSuccess)
+        {
+            _errorCode = result.ErrorCode;
+            _errorMessage = result.ErrorMessage;
+            return;
+        }
+
+        await LoadAsync();
+    }
+}

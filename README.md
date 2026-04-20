@@ -22,6 +22,7 @@ O projeto esta organizado por camadas:
 - `GoodHamburger.Application`: casos de uso, validacoes e contratos de repositorio
 - `GoodHamburger.Domain`: entidades e regras de negocio
 - `GoodHamburger.Infra`: persistencia, EF Core, migrations e seed
+- `GoodHamburger.View`: frontend Blazor Server com Tailwind CSS
 - `GoodHamburger.Application.Tests`: testes unitarios de casos de uso
 - `GoodHamburger.Domain.Tests`: testes unitarios de regra de desconto
 
@@ -67,6 +68,16 @@ dotnet run --project GoodHamburger.Api
 ```
 
 A API sobe com Swagger/OpenAPI em ambiente de desenvolvimento.
+
+### 6) Rodar View (Blazor Server)
+
+Em outro terminal:
+
+```bash
+dotnet run --project GoodHamburger.View
+```
+
+URL padrao da View: `http://localhost:5189`
 
 ## Como rodar testes
 
@@ -136,6 +147,5 @@ Codigos usados:
 
 ## Itens fora do escopo
 
-- Frontend (Blazor)
 - Testes de integracao HTTP e banco real
 - Autenticacao/autorizacao

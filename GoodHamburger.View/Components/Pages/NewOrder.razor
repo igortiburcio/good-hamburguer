@@ -1,0 +1,65 @@
+@page "/orders/new"
+@inherits GoodHamburger.View.Components.Pages.OrderFormBase
+
+<PageTitle>Novo Pedido</PageTitle>
+
+<div class="mx-auto max-w-4xl px-4 py-8">
+    <h1 class="mb-2 text-3xl font-bold tracking-tight text-slate-900">Novo pedido</h1>
+    <p class="mb-6 text-slate-600">Selecione no maximo um item por categoria.</p>
+
+    <GoodHamburger.View.Components.Shared.ApiErrorAlert Code="@ErrorCode" Message="@ErrorMessage" />
+
+@if (IsLoading)
+    {
+        <div class="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">Carregando opcoes...</div>
+}
+    else
+    {
+        <div class="space-y-6">
+            <div class="rounded-xl border border-slate-200 bg-white p-6">
+                <label class="mb-2 block text-sm font-semibold text-slate-700">Nome do cliente</label>
+                <input class="w-full rounded-md border border-slate-300 px-3 py-2" @bind="ClientName" placeholder="Ex.: Igor" />
+            </div>
+
+            @foreach (var group in GroupedMenu())
+            {
+                <div class="rounded-xl border border-slate-200 bg-white p-6">
+                    <label class="mb-2 block text-sm font-semibold uppercase tracking-wide text-slate-700">@group.Key</label>
+                    <select class="w-full rounded-md border border-slate-300 px-3 py-2" @bind="SelectedByCategory[group.Key]">
+                        <option value="">Nenhum</option>
+                        @foreach (var item in group)
+                        {
+                            <option value="@item.Id">@item.Name (@item.Price.ToString("C"))</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="flex gap-3">
+                <button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60" disabled="@IsSubmitting" type="button" @onclick="CreateAsync">
+                    @if (IsSubmitting)
+                    {
+                        <span>Salvando...</span>
+                    }
+                    else
+                    {
+                        <span>Criar pedido</span>
+                    }
+                </button>
+                <a href="/orders" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cancelar</a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMenuAsync();
+    }
+
+    private async Task CreateAsync()
+    {
+        await SubmitAsync(request => OrdersApiClient.CreateAsync(request));
+    }
+}
