@@ -7,7 +7,7 @@ namespace GoodHamburger.Api.Src.Controllers;
 [Route("api/menu")]
 public class MenuController(ILogger<MenuController> logger) : ControllerBase
 {
-    private static readonly string[] _menu = ["Hamburger", "Cheeseburger", "Veggie Burger", "Chicken Burger", "Fish Burger"];
+    private readonly string[] _menu = ["Hamburger", "Cheeseburger", "Veggie Burger", "Chicken Burger", "Fish Burger"];
 
     [HttpGet()]
     public IActionResult GetMenu()
