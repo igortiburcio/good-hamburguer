@@ -29,7 +29,7 @@
                         <option value="">Nenhum</option>
                         @foreach (var item in group)
                         {
-                            <option value="@item.Id">@item.Name (@item.Price.ToString("C"))</option>
+                            <option value="@item.Id">@item.Name (@item.Price.ToBrl())</option>
                         }
                     </select>
                 </div>
