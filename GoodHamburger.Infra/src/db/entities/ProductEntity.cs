@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 namespace GoodHamburger.Infra.Src.Db.Entities;
 
 [Table("products")]
+[Index(nameof(Name), IsUnique = true)]
 public class ProductEntity
 {
     [Key]
