@@ -1,0 +1,12 @@
+{
+  "omnisharp.dotnetPath": "/Users/igortiburciocavalcanti/.local/share/mise/dotnet-root/dotnet",
+  "terminal.integrated.env.osx": {
+    "PATH": "/Users/igortiburciocavalcanti/.local/share/mise/shims:${env:PATH}"
+  },
+  "dotnetAcquisitionExtension.existingDotnetPath": [
+    {
+      "extensionId": "ms-dotnettools.csharp",
+      "path": "/Users/igortiburciocavalcanti/.local/share/mise/dotnet-root/dotnet"
+    }
+  ]
+}
