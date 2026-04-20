@@ -55,6 +55,66 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
         return orderEntities.Select(MapToDomain).ToList();
     }
 
+    public async Task<Order?> UpdateAsync(Order order)
+    {
+        if (!Guid.TryParse(order.id, out var orderId))
+        {
+            return null;
+        }
+
+        var orderEntity = await dbContext.Orders
+            .Include(o => o.OrderProducts)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+
+        if (orderEntity is null)
+        {
+            return null;
+        }
+
+        orderEntity.ClientName = order.ClientName;
+        orderEntity.TotalPrice = order.TotalPrice;
+
+        dbContext.OrderProducts.RemoveRange(orderEntity.OrderProducts);
+
+        var productLinks = order.Products
+            .Select(p => new OrderProductEntity
+            {
+                OrderId = orderId,
+                ProductId = Guid.Parse(p.id)
+            })
+            .ToList();
+
+        dbContext.OrderProducts.AddRange(productLinks);
+
+        await dbContext.SaveChangesAsync();
+
+        return await GetOrderByIdAsync(orderId);
+    }
+
+    public async Task<bool> DeleteAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var orderId))
+        {
+            return false;
+        }
+
+        var orderEntity = await dbContext.Orders
+            .Include(o => o.OrderProducts)
+            .FirstOrDefaultAsync(o => o.Id == orderId);
+
+        if (orderEntity is null)
+        {
+            return false;
+        }
+
+        dbContext.OrderProducts.RemoveRange(orderEntity.OrderProducts);
+        dbContext.Orders.Remove(orderEntity);
+
+        await dbContext.SaveChangesAsync();
+
+        return true;
+    }
+
     private async Task<Order> GetRequiredByIdAsync(Guid id)
     {
         var order = await GetOrderByIdAsync(id)
