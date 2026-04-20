@@ -25,13 +25,13 @@ public class OrderUseCase(
 
         var created = await orderRepository.CreateAsync(orderToCreate);
 
-        return MapWithTotals(created);
+        return OrderWithPrices(created);
     }
 
     public async Task<List<OrderWithTotals>> GetAllAsync()
     {
         var orders = await orderRepository.GetAllAsync();
-        return orders.Select(MapWithTotals).ToList();
+        return orders.Select(OrderWithPrices).ToList();
     }
 
     public async Task<OrderWithTotals> GetByIdAsync(string id)
@@ -39,7 +39,7 @@ public class OrderUseCase(
         var order = await orderRepository.GetByIdAsync(id)
             ?? throw new ResourceNotFoundException($"Pedido '{id}' nao encontrado.");
 
-        return MapWithTotals(order);
+        return OrderWithPrices(order);
     }
 
     public async Task<OrderWithTotals> UpdateAsync(string id, string clientName, List<string> productIds)
@@ -63,7 +63,7 @@ public class OrderUseCase(
         var updated = await orderRepository.UpdateAsync(orderToUpdate)
             ?? throw new ResourceNotFoundException($"Pedido '{id}' nao encontrado.");
 
-        return MapWithTotals(updated);
+        return OrderWithPrices(updated);
     }
 
     public async Task DeleteAsync(string id)
@@ -129,7 +129,7 @@ public class OrderUseCase(
         }
     }
 
-    private static OrderWithTotals MapWithTotals(Order order)
+    private static OrderWithTotals OrderWithPrices(Order order)
     {
         return new OrderWithTotals(
             order.id,
