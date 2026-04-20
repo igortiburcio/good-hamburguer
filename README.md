@@ -6,6 +6,10 @@ API REST para registro de pedidos da lanchonete Good Hamburger, implementada em 
 
 Este projeto atende ao desafio tecnico de CRUD de pedidos com regras de desconto, validacoes de negocio e endpoint de cardapio.
 
+## Deploy
+
+Fiz um deploy quie pode ser testado no seguinte link: https://stgen-teste.duduisonfire.com/
+
 ## Stack
 
 - .NET 10
@@ -34,13 +38,44 @@ Este README concentra as informacoes principais para execucao, arquitetura e uso
 
 Copie `.env.example` para `.env` e ajuste se necessario.
 
-### 2) Subir banco com Docker
+### 2) Subir PostgreSQL (somente banco)
 
 ```bash
-docker compose up -d
+docker compose up -d postgres
 ```
 
-### 2.1) Subir stack completa via Docker (API + View + banco)
+### 3) Restaurar pacotes
+
+```bash
+dotnet restore
+```
+
+### 4) Executar aplicacao
+
+Voce pode executar de duas formas.
+
+#### Opcao A: sem Docker (local)
+
+Use o passo 3 antes desta opcao.
+
+Terminal 1 (API):
+
+```bash
+dotnet run --project GoodHamburger.Api
+```
+
+Terminal 2 (View):
+
+```bash
+dotnet run --project GoodHamburger.View
+```
+
+URLs locais:
+
+- View: `http://localhost:5189`
+- API: `http://localhost:5078`
+
+#### Opcao B: com Docker (stack completa)
 
 ```bash
 docker compose up --build -d
@@ -50,49 +85,6 @@ URLs locais:
 
 - View: `http://localhost:5189`
 - API: `http://localhost:5078`
-
-### 3) Restaurar pacotes
-
-```bash
-dotnet restore
-```
-
-### 4) Aplicar migrations
-
-Se `dotnet ef` estiver instalado globalmente:
-
-```bash
-dotnet ef database update --project GoodHamburger.Infra --startup-project GoodHamburger.Api
-```
-
-Se usar ferramenta local por manifest:
-
-```bash
-dotnet tool restore
-dotnet tool run dotnet-ef database update --project GoodHamburger.Infra --startup-project GoodHamburger.Api
-```
-
-### 5) Rodar API
-
-```bash
-dotnet run --project GoodHamburger.Api
-```
-
-A API sobe com Swagger/OpenAPI em ambiente de desenvolvimento.
-
-### 6) Rodar View (Blazor Server)
-
-Em outro terminal:
-
-```bash
-dotnet run --project GoodHamburger.View
-```
-
-URL padrao da View: `http://localhost:5189`
-
-## Deploy
-
-Fiz um deploy quie pode ser testado no seguinte link: https://stgen-teste.duduisonfire.com/
 
 ## Como rodar testes
 
