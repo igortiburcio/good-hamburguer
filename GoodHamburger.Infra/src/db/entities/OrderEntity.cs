@@ -16,6 +16,14 @@ public class OrderEntity
     public required string ClientName { get; set; }
 
     [Precision(10, 2)]
+    [Column("subtotal")]
+    public decimal Subtotal { get; set; }
+
+    [Precision(10, 2)]
+    [Column("discount")]
+    public decimal Discount { get; set; }
+
+    [Precision(10, 2)]
     [Column("total_price")]
     public decimal TotalPrice { get; set; }
 

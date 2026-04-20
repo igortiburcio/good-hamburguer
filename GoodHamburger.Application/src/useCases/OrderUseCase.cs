@@ -12,7 +12,13 @@ public class OrderUseCase(IOrderRepository orderRepository, IProductRepository p
         ValidateClientName(clientName);
 
         var totals = CalculateTotals(products);
-        var orderToCreate = new Order(string.Empty, clientName.Trim(), totals.TotalFinal, products);
+        var orderToCreate = new Order(
+            string.Empty,
+            clientName.Trim(),
+            totals.Subtotal,
+            totals.Discount,
+            totals.TotalFinal,
+            products);
 
         var created = await orderRepository.CreateAsync(orderToCreate);
 
@@ -43,7 +49,13 @@ public class OrderUseCase(IOrderRepository orderRepository, IProductRepository p
         var products = await ResolveAndValidateProductsAsync(productIds);
         var totals = CalculateTotals(products);
 
-        var orderToUpdate = new Order(existing.id, clientName.Trim(), totals.TotalFinal, products);
+        var orderToUpdate = new Order(
+            existing.id,
+            clientName.Trim(),
+            totals.Subtotal,
+            totals.Discount,
+            totals.TotalFinal,
+            products);
 
         var updated = await orderRepository.UpdateAsync(orderToUpdate)
             ?? throw new ResourceNotFoundException($"Pedido '{id}' nao encontrado.");
@@ -116,14 +128,12 @@ public class OrderUseCase(IOrderRepository orderRepository, IProductRepository p
 
     private static OrderWithTotals MapWithTotals(Order order)
     {
-        var totals = CalculateTotals(order.Products);
-
         return new OrderWithTotals(
             order.id,
             order.ClientName,
-            totals.Subtotal,
-            totals.Discount,
-            totals.TotalFinal,
+            order.Subtotal,
+            order.Discount,
+            order.TotalPrice,
             order.Products);
     }
 

@@ -15,6 +15,8 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
         {
             Id = orderId,
             ClientName = order.ClientName,
+            Subtotal = order.Subtotal,
+            Discount = order.Discount,
             TotalPrice = order.TotalPrice
         };
 
@@ -73,6 +75,8 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
         }
 
         orderEntity.ClientName = order.ClientName;
+        orderEntity.Subtotal = order.Subtotal;
+        orderEntity.Discount = order.Discount;
         orderEntity.TotalPrice = order.TotalPrice;
 
         dbContext.OrderProducts.RemoveRange(orderEntity.OrderProducts);
@@ -149,6 +153,8 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
         return new Order(
             orderEntity.Id.ToString(),
             orderEntity.ClientName,
+            orderEntity.Subtotal,
+            orderEntity.Discount,
             orderEntity.TotalPrice,
             products);
     }
