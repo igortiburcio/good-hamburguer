@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using GoodHamburger.Infra.Src.Db.Repositories;
+using GoodHamburger.Infra.Src.Db.Seeds;
 using GoodHamburger.Application.Src.Repositories;
 
 namespace GoodHamburger.Infra.Src.Db;
@@ -31,6 +32,7 @@ public static class DependencyInjection
     {
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IComboRepository, ComboRepository>();
 
         return services;
     }

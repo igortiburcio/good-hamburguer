@@ -6,6 +6,7 @@ namespace GoodHamburger.Infra.Src.Db.Entities;
 
 [Table("products")]
 [Index(nameof(Name), IsUnique = true)]
+[Index(nameof(CategoryId))]
 public class ProductEntity
 {
     [Key]
@@ -19,8 +20,11 @@ public class ProductEntity
     public decimal Price { get; set; }
 
     [Required]
-    [MaxLength(60)]
-    public required string Category { get; set; }
+    [Column("category_id")]
+    public Guid CategoryId { get; set; }
+
+    [ForeignKey(nameof(CategoryId))]
+    public ProductCategoryEntity Category { get; set; } = null!;
 
     public ICollection<OrderProductEntity> OrderProducts { get; set; } = [];
 }

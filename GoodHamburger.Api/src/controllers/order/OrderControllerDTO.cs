@@ -30,7 +30,7 @@ public record OrderProductResponse
 
     public decimal Price { get; set; }
 
-    public required string Type { get; set; }
+    public required string Category { get; set; }
 }
 
 public record ErrorResponse

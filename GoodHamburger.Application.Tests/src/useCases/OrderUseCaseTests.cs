@@ -9,15 +9,24 @@ namespace GoodHamburger.Application.Tests.Src.UseCases;
 
 public class OrderUseCaseTests
 {
+    private static readonly List<Combo> DefaultCombos =
+    [
+        new("1", "Combo Good Hamburger", 20m, ["Hamburger", "Fries", "Drink"]),
+        new("2", "Combo Good Drink", 15m, ["Hamburger", "Drink"]),
+        new("3", "Combo Good Fries", 10m, ["Hamburger", "Fries"])
+    ];
+
     [Fact]
     public async Task CreateAsync_WhenValidInput_ShouldCreateOrderAndReturnTotals()
     {
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
-        var hamburger = new Product("h1", "X Burger", 5.00m, ProductType.Hamburger);
-        var fries = new Product("f1", "Batata frita", 2.00m, ProductType.Fries);
+        var hamburger = new Product("h1", "X Burger", 5.00m, "Hamburger");
+        var fries = new Product("f1", "Batata frita", 2.00m, "Fries");
 
         productRepository.GetAllProductsAsync()
             .Returns(Task.FromResult(new List<Product> { hamburger, fries }));
@@ -51,7 +60,7 @@ public class OrderUseCaseTests
     public async Task CreateAsync_WhenClientNameIsInvalid_ShouldThrowInvalidOrderException(string clientName)
     {
         var sut = CreateSutWithMenu(out _, out _,
-            new Product("h1", "X Burger", 5.00m, ProductType.Hamburger));
+            new Product("h1", "X Burger", 5.00m, "Hamburger"));
 
         await Assert.ThrowsAsync<InvalidOrderException>(() => sut.CreateAsync(clientName, ["h1"]));
     }
@@ -60,7 +69,7 @@ public class OrderUseCaseTests
     public async Task CreateAsync_WhenProductIdsIsEmpty_ShouldThrowInvalidOrderException()
     {
         var sut = CreateSutWithMenu(out _, out _,
-            new Product("h1", "X Burger", 5.00m, ProductType.Hamburger));
+            new Product("h1", "X Burger", 5.00m, "Hamburger"));
 
         await Assert.ThrowsAsync<InvalidOrderException>(() => sut.CreateAsync("Igor", []));
     }
@@ -69,7 +78,7 @@ public class OrderUseCaseTests
     public async Task CreateAsync_WhenProductIdsHasDuplicateIds_ShouldThrowDuplicateOrderItemsException()
     {
         var sut = CreateSutWithMenu(out _, out _,
-            new Product("h1", "X Burger", 5.00m, ProductType.Hamburger));
+            new Product("h1", "X Burger", 5.00m, "Hamburger"));
 
         await Assert.ThrowsAsync<DuplicateOrderItemsException>(() => sut.CreateAsync("Igor", ["h1", "H1"]));
     }
@@ -78,7 +87,7 @@ public class OrderUseCaseTests
     public async Task CreateAsync_WhenProductIsNotInMenu_ShouldThrowInvalidOrderException()
     {
         var sut = CreateSutWithMenu(out _, out _,
-            new Product("h1", "X Burger", 5.00m, ProductType.Hamburger));
+            new Product("h1", "X Burger", 5.00m, "Hamburger"));
 
         await Assert.ThrowsAsync<InvalidOrderException>(() => sut.CreateAsync("Igor", ["missing"]));
     }
@@ -87,8 +96,8 @@ public class OrderUseCaseTests
     public async Task CreateAsync_WhenHasDuplicateProductTypes_ShouldThrowDuplicateOrderItemsException()
     {
         var sut = CreateSutWithMenu(out _, out _,
-            new Product("h1", "X Burger", 5.00m, ProductType.Hamburger),
-            new Product("h2", "X Bacon", 7.00m, ProductType.Hamburger));
+            new Product("h1", "X Burger", 5.00m, "Hamburger"),
+            new Product("h2", "X Bacon", 7.00m, "Hamburger"));
 
         await Assert.ThrowsAsync<DuplicateOrderItemsException>(() => sut.CreateAsync("Igor", ["h1", "h2"]));
     }
@@ -102,12 +111,14 @@ public class OrderUseCaseTests
             7.00m,
             0.70m,
             6.30m,
-            [new Product("h1", "X Burger", 5.00m, ProductType.Hamburger)]);
+            [new Product("h1", "X Burger", 5.00m, "Hamburger")]);
 
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
         orderRepository.GetByIdAsync("o-1").Returns(Task.FromResult<Order?>(order));
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         var result = await sut.GetByIdAsync("o-1");
 
@@ -123,7 +134,9 @@ public class OrderUseCaseTests
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
         orderRepository.GetByIdAsync("missing").Returns(Task.FromResult<Order?>(null));
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         await Assert.ThrowsAsync<ResourceNotFoundException>(() => sut.GetByIdAsync("missing"));
     }
@@ -139,7 +152,7 @@ public class OrderUseCaseTests
                 7.00m,
                 0.70m,
                 6.30m,
-                [new Product("h1", "X Burger", 5.00m, ProductType.Hamburger)]),
+                [new Product("h1", "X Burger", 5.00m, "Hamburger")]),
             new(
                 "o-2",
                 "Ana",
@@ -147,16 +160,18 @@ public class OrderUseCaseTests
                 1.90m,
                 7.60m,
                 [
-                    new Product("h1", "X Burger", 5.00m, ProductType.Hamburger),
-                    new Product("f1", "Batata frita", 2.00m, ProductType.Fries),
-                    new Product("d1", "Refrigerante", 2.50m, ProductType.Drink)
+                    new Product("h1", "X Burger", 5.00m, "Hamburger"),
+                    new Product("f1", "Batata frita", 2.00m, "Fries"),
+                    new Product("d1", "Refrigerante", 2.50m, "Drink")
                 ])
         };
 
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
         orderRepository.GetAllAsync().Returns(Task.FromResult(orders));
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         var result = await sut.GetAllAsync();
 
@@ -174,10 +189,10 @@ public class OrderUseCaseTests
             5.00m,
             0m,
             5.00m,
-            [new Product("h1", "X Burger", 5.00m, ProductType.Hamburger)]);
+            [new Product("h1", "X Burger", 5.00m, "Hamburger")]);
 
-        var hamburger = new Product("h1", "X Burger", 5.00m, ProductType.Hamburger);
-        var drink = new Product("d1", "Refrigerante", 2.50m, ProductType.Drink);
+        var hamburger = new Product("h1", "X Burger", 5.00m, "Hamburger");
+        var drink = new Product("d1", "Refrigerante", 2.50m, "Drink");
 
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
@@ -187,7 +202,9 @@ public class OrderUseCaseTests
         orderRepository.UpdateAsync(Arg.Any<Order>())
             .Returns(callInfo => Task.FromResult<Order?>(callInfo.Arg<Order>()));
 
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         var result = await sut.UpdateAsync("o-1", "  New  ", ["h1", "d1"]);
 
@@ -203,7 +220,9 @@ public class OrderUseCaseTests
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
         orderRepository.GetByIdAsync("missing").Returns(Task.FromResult<Order?>(null));
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         await Assert.ThrowsAsync<ResourceNotFoundException>(() => sut.UpdateAsync("missing", "Igor", ["h1"]));
     }
@@ -214,7 +233,9 @@ public class OrderUseCaseTests
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
         orderRepository.DeleteAsync("o-1").Returns(Task.FromResult(true));
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         var exception = await Record.ExceptionAsync(() => sut.DeleteAsync("o-1"));
 
@@ -227,7 +248,9 @@ public class OrderUseCaseTests
         var orderRepository = Substitute.For<IOrderRepository>();
         var productRepository = Substitute.For<IProductRepository>();
         orderRepository.DeleteAsync("missing").Returns(Task.FromResult(false));
-        var sut = new OrderUseCase(orderRepository, productRepository);
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
 
         await Assert.ThrowsAsync<ResourceNotFoundException>(() => sut.DeleteAsync("missing"));
     }
@@ -239,7 +262,9 @@ public class OrderUseCaseTests
     {
         orderRepository = Substitute.For<IOrderRepository>();
         productRepository = Substitute.For<IProductRepository>();
+        var comboRepository = Substitute.For<IComboRepository>();
+        comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
         productRepository.GetAllProductsAsync().Returns(Task.FromResult(menu.ToList()));
-        return new OrderUseCase(orderRepository, productRepository);
+        return new OrderUseCase(orderRepository, productRepository, comboRepository);
     }
 }

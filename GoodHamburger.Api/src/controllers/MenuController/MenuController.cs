@@ -20,7 +20,7 @@ public class MenuController(ILogger<MenuController> logger, MenuUseCase _menuUse
             Id = item.id,
             Name = item.Name,
             Price = item.Price,
-            Category = _menuUseCase.ParseProductType(item.Type)
+            Category = item.Category
         }).ToList();
 
         return Ok(response);

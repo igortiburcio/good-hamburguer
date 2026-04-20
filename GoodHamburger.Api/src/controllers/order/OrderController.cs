@@ -108,7 +108,7 @@ public class OrderController(OrderUseCase orderUseCase) : ControllerBase
             Id = product.id,
             Name = product.Name,
             Price = product.Price,
-            Type = product.Type.ToString()
+            Category = product.Category
         };
     }
 }

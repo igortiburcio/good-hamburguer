@@ -4,14 +4,17 @@ using GoodHamburger.Application.Src.Repositories;
 
 namespace GoodHamburger.Application.Src.UseCases;
 
-public class OrderUseCase(IOrderRepository orderRepository, IProductRepository productRepository)
+public class OrderUseCase(
+    IOrderRepository orderRepository,
+    IProductRepository productRepository,
+    IComboRepository comboRepository)
 {
     public async Task<OrderWithTotals> CreateAsync(string clientName, List<string> productIds)
     {
         var products = await ResolveAndValidateProductsAsync(productIds);
         ValidateClientName(clientName);
 
-        var totals = CalculateTotals(products);
+        var totals = await CalculateTotalsAsync(products);
         var orderToCreate = new Order(
             string.Empty,
             clientName.Trim(),
@@ -47,7 +50,7 @@ public class OrderUseCase(IOrderRepository orderRepository, IProductRepository p
             ?? throw new ResourceNotFoundException($"Pedido '{id}' nao encontrado.");
 
         var products = await ResolveAndValidateProductsAsync(productIds);
-        var totals = CalculateTotals(products);
+        var totals = await CalculateTotalsAsync(products);
 
         var orderToUpdate = new Order(
             existing.id,
@@ -108,7 +111,7 @@ public class OrderUseCase(IOrderRepository orderRepository, IProductRepository p
     private static void ValidateNoDuplicateProductTypes(List<Product> products)
     {
         var duplicatedType = products
-            .GroupBy(p => p.Type)
+            .GroupBy(p => p.Category, StringComparer.OrdinalIgnoreCase)
             .FirstOrDefault(group => group.Count() > 1);
 
         if (duplicatedType is not null)
@@ -137,11 +140,12 @@ public class OrderUseCase(IOrderRepository orderRepository, IProductRepository p
             order.Products);
     }
 
-    private static OrderTotals CalculateTotals(List<Product> products)
+    private async Task<OrderTotals> CalculateTotalsAsync(List<Product> products)
     {
         var subtotal = products.Sum(p => p.Price);
         var discountCalculator = new CalculateDiscount();
-        var totalFinal = discountCalculator.Execute(products);
+        var combos = await comboRepository.GetActiveCombosAsync();
+        var totalFinal = discountCalculator.Execute(products, combos);
         var discount = subtotal - totalFinal;
 
         return new OrderTotals(subtotal, discount, totalFinal);

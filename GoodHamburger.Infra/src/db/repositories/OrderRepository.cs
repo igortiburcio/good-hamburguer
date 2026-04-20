@@ -53,6 +53,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .AsNoTracking()
             .Include(o => o.OrderProducts)
             .ThenInclude(op => op.Product)
+            .ThenInclude(p => p.Category)
             .ToListAsync();
 
         return orderEntities.Select(MapToDomain).ToList();
@@ -135,6 +136,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .AsNoTracking()
             .Include(o => o.OrderProducts)
             .ThenInclude(op => op.Product)
+            .ThenInclude(p => p.Category)
             .FirstOrDefaultAsync(o => o.Id == id);
 
         return orderEntity is null ? null : MapToDomain(orderEntity);
@@ -147,7 +149,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
                 link.Product.Id.ToString(),
                 link.Product.Name,
                 link.UnitPrice,
-                ParseProductType(link.Product.Category)))
+                link.Product.Category.Name))
             .ToList();
 
         return new Order(
@@ -159,14 +161,4 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             products);
     }
 
-    private static ProductType ParseProductType(string category)
-    {
-        return category switch
-        {
-            "Hamburger" => ProductType.Hamburger,
-            "Fries" => ProductType.Fries,
-            "Drink" => ProductType.Drink,
-            _ => throw new InvalidOperationException($"Unknown product category '{category}'.")
-        };
-    }
 }

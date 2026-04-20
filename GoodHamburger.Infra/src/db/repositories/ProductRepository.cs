@@ -10,24 +10,14 @@ public class ProductRepository(AppDbContext dbContext) : IProductRepository
     {
         var products = await dbContext.Products
             .AsNoTracking()
+            .Include(entity => entity.Category)
             .Select(entity => new Product(
                 entity.Id.ToString(),
                 entity.Name,
                 entity.Price,
-                ParseProductType(entity.Category)))
+                entity.Category.Name))
             .ToListAsync();
 
         return products;
-    }
-
-    private static ProductType ParseProductType(string category)
-    {
-        return category switch
-        {
-            "Hamburger" => ProductType.Hamburger,
-            "Fries" => ProductType.Fries,
-            "Drink" => ProductType.Drink,
-            _ => throw new InvalidOperationException($"Unknown product category '{category}'.")
-        };
     }
 }
