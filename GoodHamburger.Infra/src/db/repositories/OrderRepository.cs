@@ -22,7 +22,8 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .Select(p => new OrderProductEntity
             {
                 OrderId = orderId,
-                ProductId = Guid.Parse(p.id)
+                ProductId = Guid.Parse(p.id),
+                UnitPrice = p.Price
             })
             .ToList();
 
@@ -80,7 +81,8 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .Select(p => new OrderProductEntity
             {
                 OrderId = orderId,
-                ProductId = Guid.Parse(p.id)
+                ProductId = Guid.Parse(p.id),
+                UnitPrice = p.Price
             })
             .ToList();
 
@@ -140,7 +142,7 @@ public class OrderRepository(AppDbContext dbContext) : IOrderRepository
             .Select(link => new Product(
                 link.Product.Id.ToString(),
                 link.Product.Name,
-                link.Product.Price,
+                link.UnitPrice,
                 ParseProductType(link.Product.Category)))
             .ToList();
 

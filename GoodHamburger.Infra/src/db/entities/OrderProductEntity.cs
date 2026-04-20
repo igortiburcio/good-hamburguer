@@ -13,6 +13,10 @@ public class OrderProductEntity
     [Column("product_id")]
     public Guid ProductId { get; set; }
 
+    [Precision(10, 2)]
+    [Column("unit_price")]
+    public decimal UnitPrice { get; set; }
+
     public OrderEntity Order { get; set; } = null!;
 
     public ProductEntity Product { get; set; } = null!;
