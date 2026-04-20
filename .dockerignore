@@ -1,0 +1,14 @@
+.git
+.gitignore
+.vscode
+**/bin
+**/obj
+**/.DS_Store
+docs
+TestResults
+coverage
+artifacts
+*.user
+*.suo
+*.cache
+.env

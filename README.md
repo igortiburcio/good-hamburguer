@@ -40,6 +40,17 @@ Copie `.env.example` para `.env` e ajuste se necessario.
 docker compose up -d
 ```
 
+### 2.1) Subir stack completa via Docker (API + View + banco)
+
+```bash
+docker compose up --build -d
+```
+
+URLs locais:
+
+- View: `http://localhost:5189`
+- API: `http://localhost:5078`
+
 ### 3) Restaurar pacotes
 
 ```bash
@@ -78,6 +89,28 @@ dotnet run --project GoodHamburger.View
 ```
 
 URL padrao da View: `http://localhost:5189`
+
+## Deploy simples (Coolify)
+
+Este repositorio esta pronto para deploy com Docker Compose:
+
+- `postgres`: banco
+- `api`: backend .NET
+- `view`: frontend Blazor Server
+
+Recomendacao no Coolify:
+
+- Expor publicamente apenas o servico `view`.
+- Manter `api` privado na rede interna (a view chama `http://api:8080`).
+
+Variaveis importantes:
+
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
+- `POSTGRES_PORT` (opcional para host)
+- `API_PORT` (opcional para host)
+- `VIEW_PORT` (opcional para host)
 
 ## Como rodar testes
 

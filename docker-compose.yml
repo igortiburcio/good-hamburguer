@@ -17,5 +17,34 @@ services:
       timeout: 5s
       retries: 5
 
+  api:
+    build:
+      context: .
+      dockerfile: GoodHamburger.Api/Dockerfile
+    container_name: good-hamburguer-api
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};Include Error Detail=true
+    ports:
+      - "${API_PORT:-5078}:8080"
+
+  view:
+    build:
+      context: .
+      dockerfile: GoodHamburger.View/Dockerfile
+    container_name: good-hamburguer-view
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ApiSettings__BaseUrl: http://api:8080
+    ports:
+      - "${VIEW_PORT:-5189}:8080"
+
 volumes:
   postgres_data:
