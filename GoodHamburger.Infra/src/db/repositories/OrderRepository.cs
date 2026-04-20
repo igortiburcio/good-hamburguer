@@ -1,5 +1,5 @@
-using GoodHamburger.Application.Src.Repositories;
 using GoodHamburger.Domain.Src;
+using GoodHamburger.Application.Src.Repositories;
 using GoodHamburger.Infra.Src.Db.Entities;
 using Microsoft.EntityFrameworkCore;
 

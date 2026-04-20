@@ -1,19 +1,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using GoodHamburger.Application.Src.Repositories;
-using GoodHamburger.Application.Src.UseCases;
 using GoodHamburger.Infra.Src.Db.Repositories;
+using GoodHamburger.Application.Src.Repositories;
 
 namespace GoodHamburger.Infra.Src.Db;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddProjectDependencies(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfraDependencies(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddInfraDatabase(configuration);
         services.AddInfraRepositories();
-        services.AddUseCases();
 
         return services;
     }
@@ -37,11 +35,14 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddUseCases(this IServiceCollection services)
+    public static IServiceProvider InitializeInfra(this IServiceProvider serviceProvider)
     {
-        services.AddScoped<MenuUseCase>();
-        services.AddScoped<OrderUseCase>();
+        using var scope = serviceProvider.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        return services;
+        dbContext.Database.Migrate();
+        DatabaseSeeder.SeedProducts(dbContext);
+
+        return serviceProvider;
     }
 }

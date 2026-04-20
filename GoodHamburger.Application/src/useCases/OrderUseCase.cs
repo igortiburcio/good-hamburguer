@@ -1,6 +1,6 @@
 using GoodHamburger.Application.Src.Errors;
-using GoodHamburger.Application.Src.Repositories;
 using GoodHamburger.Domain.Src;
+using GoodHamburger.Domain.Src.Repositories;
 
 namespace GoodHamburger.Application.Src.UseCases;
 

@@ -1,5 +1,5 @@
-using GoodHamburger.Application.Src.Repositories;
 using GoodHamburger.Domain.Src;
+using GoodHamburger.Application.Src.Repositories;
 
 namespace GoodHamburger.Application.Src.UseCases;
 

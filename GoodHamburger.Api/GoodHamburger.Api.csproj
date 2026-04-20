@@ -16,11 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GoodHamburger.Infra\GoodHamburger.Infra.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GoodHamburger.Application\GoodHamburger.Application.csproj" />
+    <ProjectReference Include="..\GoodHamburger.Infra\GoodHamburger.Infra.csproj" />
   </ItemGroup>
 
 </Project>
