@@ -1,5 +1,3 @@
-using GoodHamburger.Domain.Src;
-
 namespace GoodHamburger.Domain.Src;
 
 public class CalculateDiscount

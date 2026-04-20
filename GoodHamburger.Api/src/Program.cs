@@ -1,4 +1,23 @@
+using GoodHamburger.Infra.Src.Db;
+using Microsoft.EntityFrameworkCore;
+
+var isDevelopment = string.Equals(
+    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+    Environments.Development,
+    StringComparison.OrdinalIgnoreCase);
+
+if (isDevelopment)
+{
+    var envPath = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"));
+
+    if (File.Exists(envPath))
+    {
+        DotNetEnv.Env.Load(envPath);
+    }
+}
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddInfraDatabase(builder.Configuration);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -16,5 +35,11 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.UseHttpsRedirection();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    dbContext.Database.Migrate();
+}
 
 app.Run();

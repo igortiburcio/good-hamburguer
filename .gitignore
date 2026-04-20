@@ -40,4 +40,8 @@ BenchmarkDotNet.Artifacts/
 # macOS
 .DS_Store
 
+# Environment files
+.env
+!.env.example
+
 docs
