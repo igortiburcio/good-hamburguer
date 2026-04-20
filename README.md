@@ -81,11 +81,10 @@ Cobertura atual:
 
 ## Regras de negocio implementadas
 
-- Sanduiche + batata + refrigerante: 20%
-- Sanduiche + refrigerante: 15%
-- Sanduiche + batata: 10%
-- Maximo de 1 item por tipo no pedido
-- Validacao de itens duplicados por ID e por tipo
+- Combos e categorias sao data-driven (vindos do banco)
+- O pedido aplica somente o melhor combo elegivel
+- Nao permite categorias repetidas no mesmo pedido
+- Validacao de itens duplicados por ID e por categoria
 - Validacao de nome do cliente obrigatorio
 
 ## Historico de pedidos (snapshot)
@@ -96,6 +95,16 @@ Para manter historico consistente, o pedido persiste:
 - `subtotal`, `discount` e `total_price` em `orders`
 
 Com isso, mudancas futuras de preco ou regra de desconto nao alteram pedidos ja registrados.
+
+## Categorias e combos no banco
+
+O desconto nao depende mais de enum fixo em codigo. A regra e baseada em dados:
+
+- `product_categories`: categorias de produto
+- `combos`: percentual de desconto e status ativo
+- `combo_categories`: categorias exigidas por combo
+
+No calculo, quando mais de um combo e elegivel, a API aplica somente o melhor combo (maior desconto).
 
 ## Endpoints principais
 

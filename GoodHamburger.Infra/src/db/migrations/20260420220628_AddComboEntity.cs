@@ -11,16 +11,11 @@ namespace GoodHamburger.Infra.Src.db.migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Category",
-                table: "products");
-
             migrationBuilder.AddColumn<Guid>(
                 name: "category_id",
                 table: "products",
                 type: "uuid",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
 
             migrationBuilder.CreateTable(
                 name: "combos",
@@ -88,6 +83,33 @@ namespace GoodHamburger.Infra.Src.db.migrations
                 column: "Name",
                 unique: true);
 
+            migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS pgcrypto;");
+
+            migrationBuilder.Sql(
+                "INSERT INTO product_categories (\"Id\", \"Name\") VALUES " +
+                "(gen_random_uuid(), 'Hamburger')," +
+                "(gen_random_uuid(), 'Fries')," +
+                "(gen_random_uuid(), 'Drink') " +
+                "ON CONFLICT (\"Name\") DO NOTHING;");
+
+            migrationBuilder.Sql(
+                "UPDATE products p SET category_id = c.\"Id\" " +
+                "FROM product_categories c " +
+                "WHERE p.\"Category\" = c.\"Name\";");
+
+            migrationBuilder.Sql(
+                "UPDATE products SET category_id = (SELECT \"Id\" FROM product_categories WHERE \"Name\" = 'Hamburger' LIMIT 1) " +
+                "WHERE category_id IS NULL;");
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "category_id",
+                table: "products",
+                type: "uuid",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uuid",
+                oldNullable: true);
+
             migrationBuilder.AddForeignKey(
                 name: "FK_products_product_categories_category_id",
                 table: "products",
@@ -95,6 +117,10 @@ namespace GoodHamburger.Infra.Src.db.migrations
                 principalTable: "product_categories",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.DropColumn(
+                name: "Category",
+                table: "products");
         }
 
         /// <inheritdoc />
