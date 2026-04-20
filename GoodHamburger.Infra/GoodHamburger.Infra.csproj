@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GoodHamburger.Domain\GoodHamburger.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GoodHamburger.Application\GoodHamburger.Application.csproj" />
   </ItemGroup>
 
