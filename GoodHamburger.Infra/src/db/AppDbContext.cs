@@ -6,4 +6,8 @@ namespace GoodHamburger.Infra.Src.Db;
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
     public DbSet<ProductEntity> Products => Set<ProductEntity>();
+
+    public DbSet<OrderEntity> Orders => Set<OrderEntity>();
+
+    public DbSet<OrderProductEntity> OrderProducts => Set<OrderProductEntity>();
 }

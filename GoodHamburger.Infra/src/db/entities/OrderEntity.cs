@@ -4,23 +4,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GoodHamburger.Infra.Src.Db.Entities;
 
-[Table("products")]
-[Index(nameof(Name), IsUnique = true)]
-public class ProductEntity
+[Table("orders")]
+public class OrderEntity
 {
     [Key]
     public Guid Id { get; set; } = Guid.NewGuid();
 
     [Required]
     [MaxLength(120)]
-    public required string Name { get; set; }
+    [Column("client_name")]
+    public required string ClientName { get; set; }
 
     [Precision(10, 2)]
-    public decimal Price { get; set; }
-
-    [Required]
-    [MaxLength(60)]
-    public required string Category { get; set; }
+    [Column("total_price")]
+    public decimal TotalPrice { get; set; }
 
     public ICollection<OrderProductEntity> OrderProducts { get; set; } = [];
 }
