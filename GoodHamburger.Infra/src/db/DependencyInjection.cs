@@ -32,6 +32,7 @@ public static class DependencyInjection
     public static IServiceCollection AddInfraRepositories(this IServiceCollection services)
     {
         services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         return services;
     }
