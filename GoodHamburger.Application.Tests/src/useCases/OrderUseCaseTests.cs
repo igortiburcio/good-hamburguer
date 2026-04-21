@@ -23,7 +23,8 @@ public class OrderUseCaseTests
         var productRepository = Substitute.For<IProductRepository>();
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         var hamburger = new Product("h1", "X Burger", 5.00m, "Hamburger");
         var fries = new Product("f1", "Batata frita", 2.00m, "Fries");
@@ -118,7 +119,8 @@ public class OrderUseCaseTests
         orderRepository.GetByIdAsync("o-1").Returns(Task.FromResult<Order?>(order));
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         var result = await sut.GetByIdAsync("o-1");
 
@@ -136,7 +138,8 @@ public class OrderUseCaseTests
         orderRepository.GetByIdAsync("missing").Returns(Task.FromResult<Order?>(null));
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         await Assert.ThrowsAsync<ResourceNotFoundException>(() => sut.GetByIdAsync("missing"));
     }
@@ -171,7 +174,8 @@ public class OrderUseCaseTests
         orderRepository.GetAllAsync().Returns(Task.FromResult(orders));
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         var result = await sut.GetAllAsync();
 
@@ -204,7 +208,8 @@ public class OrderUseCaseTests
 
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         var result = await sut.UpdateAsync("o-1", "  New  ", ["h1", "d1"]);
 
@@ -222,7 +227,8 @@ public class OrderUseCaseTests
         orderRepository.GetByIdAsync("missing").Returns(Task.FromResult<Order?>(null));
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         await Assert.ThrowsAsync<ResourceNotFoundException>(() => sut.UpdateAsync("missing", "Igor", ["h1"]));
     }
@@ -235,7 +241,8 @@ public class OrderUseCaseTests
         orderRepository.DeleteAsync("o-1").Returns(Task.FromResult(true));
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         var exception = await Record.ExceptionAsync(() => sut.DeleteAsync("o-1"));
 
@@ -250,7 +257,8 @@ public class OrderUseCaseTests
         orderRepository.DeleteAsync("missing").Returns(Task.FromResult(false));
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
-        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        var sut = new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
 
         await Assert.ThrowsAsync<ResourceNotFoundException>(() => sut.DeleteAsync("missing"));
     }
@@ -265,6 +273,7 @@ public class OrderUseCaseTests
         var comboRepository = Substitute.For<IComboRepository>();
         comboRepository.GetActiveCombosAsync().Returns(Task.FromResult(DefaultCombos));
         productRepository.GetAllProductsAsync().Returns(Task.FromResult(menu.ToList()));
-        return new OrderUseCase(orderRepository, productRepository, comboRepository);
+        var discountCalculator = new DiscountCalculator();
+        return new OrderUseCase(orderRepository, productRepository, comboRepository, discountCalculator);
     }
 }

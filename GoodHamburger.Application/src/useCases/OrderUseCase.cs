@@ -7,7 +7,8 @@ namespace GoodHamburger.Application.Src.UseCases;
 public class OrderUseCase(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
-    IComboRepository comboRepository)
+    IComboRepository comboRepository,
+    DiscountCalculator discountCalculator)
 {
     public async Task<OrderWithTotals> CreateAsync(string clientName, List<string> productIds)
     {
@@ -143,7 +144,6 @@ public class OrderUseCase(
     private async Task<OrderTotals> CalculateTotalsAsync(List<Product> products)
     {
         var subtotal = products.Sum(p => p.Price);
-        var discountCalculator = new CalculateDiscount();
         var combos = await comboRepository.GetActiveCombosAsync();
         var totalFinal = discountCalculator.Execute(products, combos);
         var discount = subtotal - totalFinal;

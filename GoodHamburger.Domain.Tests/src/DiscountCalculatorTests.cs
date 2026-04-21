@@ -5,7 +5,7 @@ namespace GoodHamburger.Domain.Tests.Src;
 
 public class CalculateDiscountTests
 {
-    private readonly CalculateDiscount _sut = new();
+    private readonly DiscountCalculator _sut = new();
     private readonly List<Combo> _defaultCombos =
     [
         new("1", "Combo Good Hamburger", 20m, ["Hamburger", "Fries", "Drink"]),

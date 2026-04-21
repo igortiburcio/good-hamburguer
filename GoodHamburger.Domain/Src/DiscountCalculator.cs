@@ -1,6 +1,6 @@
 namespace GoodHamburger.Domain.Src;
 
-public class CalculateDiscount
+public class DiscountCalculator
 {
     public decimal Execute(List<Product> products, List<Combo> combos)
     {
