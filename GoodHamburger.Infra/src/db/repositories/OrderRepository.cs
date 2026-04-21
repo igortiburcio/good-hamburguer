@@ -13,7 +13,7 @@ public class OrderRepository(AppDbContext dbContext, HybridCache hybridCache) : 
 
     public async Task<Order> CreateAsync(Order order)
     {
-        var orderId = string.IsNullOrWhiteSpace(order.id) ? Guid.NewGuid() : Guid.Parse(order.id);
+        var orderId = string.IsNullOrWhiteSpace(order.Id) ? Guid.NewGuid() : Guid.Parse(order.Id);
 
         var orderEntity = new OrderEntity
         {
@@ -28,7 +28,7 @@ public class OrderRepository(AppDbContext dbContext, HybridCache hybridCache) : 
             .Select(p => new OrderProductEntity
             {
                 OrderId = orderId,
-                ProductId = Guid.Parse(p.id),
+                ProductId = Guid.Parse(p.Id),
                 UnitPrice = p.Price
             })
             .ToList();
@@ -77,7 +77,7 @@ public class OrderRepository(AppDbContext dbContext, HybridCache hybridCache) : 
 
     public async Task<Order?> UpdateAsync(Order order)
     {
-        if (!Guid.TryParse(order.id, out var orderId))
+        if (!Guid.TryParse(order.Id, out var orderId))
         {
             return null;
         }
@@ -102,7 +102,7 @@ public class OrderRepository(AppDbContext dbContext, HybridCache hybridCache) : 
             .Select(p => new OrderProductEntity
             {
                 OrderId = orderId,
-                ProductId = Guid.Parse(p.id),
+                ProductId = Guid.Parse(p.Id),
                 UnitPrice = p.Price
             })
             .ToList();

@@ -54,7 +54,7 @@ public class OrderUseCase(
         var totals = await CalculateTotalsAsync(products);
 
         var orderToUpdate = new Order(
-            existing.id,
+            existing.Id,
             clientName.Trim(),
             totals.Subtotal,
             totals.Discount,
@@ -90,7 +90,7 @@ public class OrderUseCase(
         }
 
         var allProducts = await productRepository.GetAllProductsAsync();
-        var productsById = allProducts.ToDictionary(p => p.id, StringComparer.OrdinalIgnoreCase);
+        var productsById = allProducts.ToDictionary(p => p.Id, StringComparer.OrdinalIgnoreCase);
 
         var selectedProducts = new List<Product>();
 
@@ -133,7 +133,7 @@ public class OrderUseCase(
     private static OrderWithTotals OrderWithPrices(Order order)
     {
         return new OrderWithTotals(
-            order.id,
+            order.Id,
             order.ClientName,
             order.Subtotal,
             order.Discount,

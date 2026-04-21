@@ -32,6 +32,8 @@ public class DiscountCalculator
             return 0m;
         }
 
-        return subtotal * (bestCombo.DiscountPercent / 100m);
+        var discountMoney = new Money(subtotal * (bestCombo.DiscountPercent / 100m));
+
+        return discountMoney.Amount;
     }
 }

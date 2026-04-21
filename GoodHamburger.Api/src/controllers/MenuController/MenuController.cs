@@ -17,7 +17,7 @@ public class MenuController(ILogger<MenuController> logger, MenuUseCase _menuUse
 
         var response = menu.Select(item => new GetMenuDto
         {
-            Id = item.id,
+            Id = item.Id,
             Name = item.Name,
             Price = item.Price,
             Category = item.Category

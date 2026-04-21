@@ -105,7 +105,7 @@ public class OrderController(OrderUseCase orderUseCase) : ControllerBase
     {
         return new OrderProductResponse
         {
-            Id = product.id,
+            Id = product.Id,
             Name = product.Name,
             Price = product.Price,
             Category = product.Category

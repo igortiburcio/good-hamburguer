@@ -36,7 +36,7 @@ public class OrderUseCaseTests
             .Returns(callInfo =>
             {
                 var input = callInfo.Arg<Order>();
-                return Task.FromResult(input with { id = "order-1" });
+                return Task.FromResult(input with { Id = "order-1" });
             });
 
         var result = await sut.CreateAsync("  Igor  ", ["h1", "f1"]);
@@ -215,8 +215,8 @@ public class OrderUseCaseTests
 
         Assert.Equal("New", result.ClientName);
         Assert.Equal(7.50m, result.Subtotal);
-        Assert.Equal(1.125m, result.Discount);
-        Assert.Equal(6.375m, result.TotalFinal);
+        Assert.Equal(1.13m, result.Discount);
+        Assert.Equal(6.37m, result.TotalFinal);
     }
 
     [Fact]
