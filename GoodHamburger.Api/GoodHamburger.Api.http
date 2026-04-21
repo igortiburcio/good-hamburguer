@@ -1,6 +1,109 @@
 @GoodHamburger.Api_HostAddress = http://localhost:5078
 
-GET {{GoodHamburger.Api_HostAddress}}/weatherforecast/
+### Menu - deve retornar 200
+# @name getMenu
+GET {{GoodHamburger.Api_HostAddress}}/api/menu
+Accept: application/json
+
+###
+
+@firstProductId = {{getMenu.response.body.$[0].id}}
+
+### Fluxo feliz - criar pedido (deve retornar 201)
+# @name createOrder
+POST {{GoodHamburger.Api_HostAddress}}/api/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "clientName": "Igor",
+  "productIds": ["{{firstProductId}}"]
+}
+
+###
+
+@createdOrderId = {{createOrder.response.body.$.id}}
+
+### Fluxo feliz - buscar pedido criado (deve retornar 200)
+GET {{GoodHamburger.Api_HostAddress}}/api/orders/{{createdOrderId}}
+Accept: application/json
+
+###
+
+### Fluxo feliz - atualizar pedido criado (deve retornar 200)
+PUT {{GoodHamburger.Api_HostAddress}}/api/orders/{{createdOrderId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "clientName": "Igor atualizado",
+  "productIds": ["{{firstProductId}}"]
+}
+
+###
+
+### Fluxo feliz - remover pedido criado (deve retornar 204)
+DELETE {{GoodHamburger.Api_HostAddress}}/api/orders/{{createdOrderId}}
+Accept: application/json
+
+###
+
+### Pedido invalido - nome vazio (deve retornar 400 INVALID_ORDER)
+POST {{GoodHamburger.Api_HostAddress}}/api/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "clientName": "   ",
+  "productIds": ["{{firstProductId}}"]
+}
+
+###
+
+### Pedido invalido - sem produtos (deve retornar 400 INVALID_ORDER)
+POST {{GoodHamburger.Api_HostAddress}}/api/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "clientName": "Igor",
+  "productIds": []
+}
+
+###
+
+### Itens duplicados - mesmo ID repetido (deve retornar 400 DUPLICATE_ORDER_ITEMS)
+POST {{GoodHamburger.Api_HostAddress}}/api/orders
+Content-Type: application/json
+Accept: application/json
+
+{
+  "clientName": "Igor",
+  "productIds": ["{{firstProductId}}", "{{firstProductId}}"]
+}
+
+###
+
+### Recurso nao encontrado - buscar pedido inexistente (deve retornar 404 RESOURCE_NOT_FOUND)
+GET {{GoodHamburger.Api_HostAddress}}/api/orders/order-id-inexistente
+Accept: application/json
+
+###
+
+### Recurso nao encontrado - atualizar pedido inexistente (deve retornar 404 RESOURCE_NOT_FOUND)
+PUT {{GoodHamburger.Api_HostAddress}}/api/orders/order-id-inexistente
+Content-Type: application/json
+Accept: application/json
+
+{
+  "clientName": "Igor",
+  "productIds": ["{{firstProductId}}"]
+}
+
+###
+
+### Recurso nao encontrado - remover pedido inexistente (deve retornar 404 RESOURCE_NOT_FOUND)
+DELETE {{GoodHamburger.Api_HostAddress}}/api/orders/order-id-inexistente
 Accept: application/json
 
 ###
